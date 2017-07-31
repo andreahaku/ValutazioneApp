@@ -7,17 +7,24 @@ require(`quasar/dist/quasar.${__THEME}.css`)
     // ==============================
 
 import Vue from 'vue'
+import VueResource from 'vue-resource'
 import Quasar from 'quasar'
 import router from './router'
 import chance from 'chance'
+import App from './App'
 
 Vue.use(Quasar) // Install Quasar Framework
+Vue.use(VueResource)
+
+localStorage.setItem("idpersona", 4765);
+localStorage.setItem("path", "http://dev41:8080");
+localStorage.setItem("uo", 57);
 
 Quasar.start(() => {
     /* eslint-disable no-new */
     new Vue({
         el: '#q-app',
         router,
-        render: h => h(require('./App'))
+        render: h => h(App)
     })
 })

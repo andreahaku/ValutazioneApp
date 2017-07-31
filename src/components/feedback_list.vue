@@ -11,7 +11,7 @@
     </div>
 
     <div class="list window-width">
-      <q-collapsible v-for="fb in feedback" :icon="fb.icon" :label="fb.nome" class="collapse">
+      <q-collapsible v-for="(fb, index) in feedback" :icon="fb.icon" :label="fb.nome" class="collapse" :key="index">
         <div class="item" v-for="n in fb.sub">
             <i class="item-primary icon">star_rate</i>
           <div class="item-content" @click="vote(n)">
