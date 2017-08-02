@@ -13,6 +13,10 @@ import router from './router'
 import chance from 'chance'
 import App from './App'
 
+import {
+    store
+} from './store';
+
 Vue.use(Quasar) // Install Quasar Framework
 Vue.use(VueResource)
 
@@ -24,6 +28,7 @@ Quasar.start(() => {
     /* eslint-disable no-new */
     new Vue({
         el: '#q-app',
+        store: store,
         router,
         render: h => h(App)
     })

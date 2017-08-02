@@ -1,15 +1,17 @@
 <template>
   <!-- Don't drop "q-app" class -->
   <div id="q-app">
-    <router-view></router-view>
+    <router-view v-if="!loading"></router-view>
   </div>
 </template>
 
 <script>
-/*
- * Root component
- */
-export default {}
+import {
+    onLoadMixin
+} from './onLoadMixin.js';
+export default {
+	mixins: [onLoadMixin]
+}
 </script>
 
 <style></style>

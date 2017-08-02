@@ -1,4 +1,5 @@
 import { eventBus } from './eventbus.js';
+import { Loading } from 'quasar'
 
 export const onLoadMixin = {
     mounted: function() {
@@ -19,41 +20,68 @@ export const onLoadMixin = {
     },
     methods: {
         init: function() {
+            Loading.show({delay: 0})
             var vm = this;
             this.promises = [];
             this.errorDetected = false;
             this.count = 0;
 
             this.promises.push(function tryGet() {
-                return vm.$http.get(vm.path + "/APIPersone?ID=.").then((response) => {
-                    var submitCompetenze = [];
-                    try {
-                        var res = response.body
+                    return vm.$http.get(vm.path + "/APIUO?ID=.").then((response) => {
+                        var submitUo = [];
                         try {
-                            var res = JSON.parse(response.body);
-                        } catch (err) {}
+                            var res = response.body
+                            try {
+                                var res = JSON.parse(response.body);
+                            } catch (err) {}
 
-                        if (res && res.APICompetenze) {
-                            for (var i = 0; i < res.APICompetenze.length; i++) {
-                                if (res.APICompetenze[i].COMPETENZA.trim() != "") {
-                                    submitCompetenze.push({
-                                        id: res.APICompetenze[i].ID,
-                                        nome: res.APICompetenze[i].COMPETENZA
+                            if (res && res.APIUO) {
+                                for (var i = 0; i < res.APIUO.length; i++) {
+                                    submitUo.push({
+                                        id: res.APIUO[i].ID,
+                                        nome: res.APIUO[i].UO
                                     })
                                 }
                             }
+                            vm.$store.commit("insertUo", submitUo);
+                            console.log("resolved uo")
+                            vm.resolved()
+                        } catch (err) {
+                            throw { nome: "Uo", err: tryGet };
                         }
-                        vm.$store.commit("insertCompetenze", submitCompetenze);
-                        console.log("resolved competenze")
-                        vm.resolved()
-                    } catch (err) {
-                        throw { nome: "Competenze", err: tryGet };
-                    }
-                }, (err) => {
-                    console.log(err);
-                    this.internalError()
-                })
-            }());
+                    }, (err) => {
+                        console.log(err);
+                        this.internalError()
+                    })
+                }());
+                this.promises.push(function tryGet() {
+                    return vm.$http.get(vm.path + "/APIRuoli?ID=.").then((response) => {
+                        var submitRuoli = [];
+                        try {
+                            var res = response.body
+                            try {
+                                var res = JSON.parse(response.body);
+                            } catch (err) {}
+
+                            if (res && res.APIRuoli) {
+                                for (var i = 0; i < res.APIRuoli.length; i++) {
+                                    submitRuoli.push({
+                                        id: res.APIRuoli[i].ID,
+                                        nome: res.APIRuoli[i].RUOLO
+                                    })
+                                }
+                            }
+                            vm.$store.commit("insertRuoli", submitRuoli);
+                            console.log("resolved ruoli")
+                            vm.resolved()
+                        } catch (err) {
+                            throw { nome: "Ruoli", err: tryGet };
+                        }
+                    }, (err) => {
+                        console.log(err);
+                        this.internalError()
+                    })
+                }());
 
             if (this.promises.length > 0) {
                 Promise.all(this.promises).then(() => {
@@ -71,6 +99,8 @@ export const onLoadMixin = {
                 })
             } else {
                 this.loading = false;
+
+                Loading.hide();
             }
         },
         resolved: function() {
@@ -83,9 +113,10 @@ export const onLoadMixin = {
         },
         load: function() {
             console.log("resolved all");
-            this.$store.commit("loaded");
             this.loading = false;
-            eventBus.$emit("feedsGreen");
+
+            Loading.hide()
+            //eventBus.$emit("feedsGreen");
         },
         internalError: function() {
             if (this.once) {
